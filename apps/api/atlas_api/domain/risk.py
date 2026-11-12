@@ -1,6 +1,6 @@
 """Transparent portfolio calculations over validated price/weight inputs."""
 from math import sqrt
-from statistics import mean, stdev
+from statistics import stdev
 from typing import Sequence
 
 
