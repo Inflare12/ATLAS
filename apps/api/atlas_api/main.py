@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from atlas_api.config import get_settings
-from atlas_api.routers import health, research
+from atlas_api.routers import health, portfolio, research
 
 settings = get_settings()
 app = FastAPI(
@@ -26,6 +26,7 @@ app.add_middleware(
 
 app.include_router(health.router, prefix=settings.api_prefix)
 app.include_router(research.router, prefix=settings.api_prefix)
+app.include_router(portfolio.router, prefix=settings.api_prefix)
 
 
 @app.get("/", tags=["root"])
