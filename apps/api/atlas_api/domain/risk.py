@@ -6,7 +6,7 @@ from typing import Sequence
 
 def _finite_positive(values: Sequence[float], name: str) -> list[float]:
     result = [float(value) for value in values]
-    if not result or any(not (value > 0 and value < float("inf")) for value in result):
+    if not result or any(not isfinite(value) or value <= 0 for value in result):
         raise ValueError(f"{name} must contain finite positive values")
     return result
 
