@@ -1,5 +1,5 @@
 """Transparent portfolio calculations over validated price/weight inputs."""
-from math import sqrt
+from math import isfinite, sqrt
 from statistics import stdev
 from typing import Sequence
 
@@ -23,7 +23,7 @@ def annualized_volatility(returns: Sequence[float], periods_per_year: int = 252)
     values = [float(value) for value in returns]
     if len(values) < 2:
         raise ValueError("at least two returns are required")
-    if periods_per_year <= 0 or any(not (-1 < x < float("inf")) for x in values):
+    if periods_per_year <= 0 or any(not (isfinite(x) and x >= -1) for x in values):
         raise ValueError("returns or periods_per_year are invalid")
     return stdev(values) * sqrt(periods_per_year)
 
@@ -42,7 +42,7 @@ def max_drawdown(prices: Sequence[float]) -> float:
 def concentration_hhi(weights: Sequence[float]) -> float:
     """Herfindahl index for long-only portfolio weights expressed as fractions."""
     values = [float(value) for value in weights]
-    if not values or any(value < 0 or value >= float("inf") for value in values):
+    if not values or any(not isfinite(value) or value < 0 for value in values):
         raise ValueError("weights must be finite and non-negative")
     if abs(sum(values) - 1.0) > 1e-6:
         raise ValueError("weights must sum to 1")
@@ -55,8 +55,8 @@ def portfolio_return(weights: Sequence[float], asset_returns: Sequence[float]) -
     r = [float(value) for value in asset_returns]
     if not w or len(w) != len(r):
         raise ValueError("weights and asset_returns must be non-empty and equal length")
-    if any(x < 0 or x >= float("inf") for x in w) or any(
-        not (-1 <= x < float("inf")) for x in r
+    if any(not isfinite(x) or x < 0 for x in w) or any(
+        not isfinite(x) or x < -1 for x in r
     ):
         raise ValueError("inputs must be finite; weights non-negative and returns >= -100%")
     if abs(sum(w) - 1.0) > 1e-6:
