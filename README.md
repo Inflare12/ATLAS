@@ -66,3 +66,13 @@ These endpoints do not fetch market prices, adjust corporate actions, estimate f
 ## Database tenant isolation
 
 `database/migrations/0001_tenant_row_level_security.sql` adds PostgreSQL row-level security to organization-scoped records. It assumes the API authenticates a user, verifies membership, and sets transaction-local `atlas.user_id` and `atlas.organization_id` settings before accessing tenant data. **Do not trust client-supplied organization IDs.** Provisioning and migrations require a separate privileged control-plane role. Review and integration-test these policies with the actual database role before handling customer data.
+
+## Architecture
+
+ATLAS is split into two connected systems:
+
+- [Website & Platform Architecture](docs/architecture/website-platform.md) — web experience, identity, APIs, portfolios, reports, alerts and deployment.
+- [Model Training & Intelligence Architecture](docs/architecture/model-training-and-intelligence.md) — data ingestion, provenance, datasets, model training, evaluation, inference and monitoring.
+- [Architecture index](docs/architecture/README.md) — shared contracts and the boundary between the two systems.
+
+The website calls the Platform API; the Platform API calls the internal Intelligence API. Model training is isolated from user-facing request handling.
