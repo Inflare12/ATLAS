@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from atlas_api.main import app
@@ -12,8 +13,8 @@ def test_price_series_risk_endpoint() -> None:
     )
     assert response.status_code == 200
     payload = response.json()
-    assert payload["daily_returns"] == [0.1, -0.1]
-    assert payload["max_drawdown"] == -0.1
+    assert payload["daily_returns"] == pytest.approx([0.1, -0.1])
+    assert payload["max_drawdown"] == pytest.approx(-0.1)
     assert payload["data_source"] == "caller_supplied"
     assert "not forecasts" in payload["limitations"][0]
 
@@ -32,7 +33,7 @@ def test_allocation_endpoint() -> None:
         json={"weights": [0.25, 0.75], "asset_returns": [0.1, -0.02]},
     )
     assert response.status_code == 200
-    assert response.json()["weighted_return"] == 0.01
+    assert response.json()["weighted_return"] == pytest.approx(0.01)
     assert response.json()["concentration_hhi"] == 0.625
 
 
