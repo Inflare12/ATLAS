@@ -62,3 +62,43 @@ def portfolio_return(weights: Sequence[float], asset_returns: Sequence[float]) -
     if abs(sum(w) - 1.0) > 1e-6:
         raise ValueError("weights must sum to 1")
     return sum(weight * asset_return for weight, asset_return in zip(w, r))
+
+
+def historical_var_cvar(
+    returns: Sequence[float], confidence_level: float = 0.95
+) -> dict[str, float | int]:
+    """Empirical historical VaR/CVaR, expressed as loss fractions.
+
+    Uses a nearest-rank empirical lower tail. The number of tail observations is
+    ceil((1 - confidence_level) * n), with at least one observation.
+    """
+    values = [float(value) for value in returns]
+    if len(values) < 2 or any(not isfinite(value) or value < -1 for value in values):
+        raise ValueError("returns must contain at least two finite values >= -100%")
+    if not isfinite(confidence_level) or not 0.5 <= confidence_level < 1:
+        raise ValueError("confidence_level must be in [0.5, 1)")
+    ordered = sorted(values)
+    tail_count = max(1, int((1.0 - confidence_level) * len(ordered) + 0.999999999))
+    tail = ordered[:tail_count]
+    return {
+        "var_loss_fraction": -tail[-1],
+        "cvar_loss_fraction": -(sum(tail) / len(tail)),
+        "tail_observations": tail_count,
+    }
+
+
+def annualized_downside_deviation(
+    returns: Sequence[float],
+    target_return: float = 0.0,
+    periods_per_year: int = 252,
+) -> float:
+    """Annualized downside deviation using all observations in the denominator."""
+    values = [float(value) for value in returns]
+    if len(values) < 2 or any(not isfinite(value) or value < -1 for value in values):
+        raise ValueError("returns must contain at least two finite values >= -100%")
+    if not isfinite(target_return) or periods_per_year <= 0:
+        raise ValueError("target_return or periods_per_year is invalid")
+    shortfalls = [min(value - target_return, 0.0) for value in values]
+    return sqrt(sum(value * value for value in shortfalls) / len(values)) * sqrt(
+        periods_per_year
+    )
