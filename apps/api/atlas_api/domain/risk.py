@@ -1,5 +1,5 @@
 """Transparent portfolio calculations over validated price/weight inputs."""
-from math import isfinite, sqrt
+from math import ceil, isfinite, sqrt
 from statistics import stdev
 from typing import Sequence
 
@@ -78,7 +78,7 @@ def historical_var_cvar(
     if not isfinite(confidence_level) or not 0.5 <= confidence_level < 1:
         raise ValueError("confidence_level must be in [0.5, 1)")
     ordered = sorted(values)
-    tail_count = max(1, int((1.0 - confidence_level) * len(ordered) + 0.999999999))
+    tail_count = max(1, ceil((1.0 - confidence_level) * len(ordered)))
     tail = ordered[:tail_count]
     return {
         "var_loss_fraction": -tail[-1],
