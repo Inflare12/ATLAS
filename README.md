@@ -50,3 +50,18 @@ This repository is being built in small, testable stages. Live market data, inve
 
 ## License
 No license has been granted yet. All rights reserved until a license is added by the project owner.
+
+
+## Portfolio risk API (current foundation)
+
+The API exposes deterministic calculations over **caller-supplied** data:
+
+- `POST /api/v1/portfolio/risk/price-series` — simple close-to-close returns, sample-standard-deviation annualized volatility, and maximum drawdown.
+- `POST /api/v1/portfolio/risk/allocation` — one-period weighted return and Herfindahl concentration.
+- `POST /api/v1/portfolio/risk/concentration` — Herfindahl concentration only.
+
+These endpoints do not fetch market prices, adjust corporate actions, estimate future returns, or provide suitability advice. Clients must supply chronological, consistently adjusted observations. Responses include methodology and limitations.
+
+## Database tenant isolation
+
+`database/migrations/0001_tenant_row_level_security.sql` adds PostgreSQL row-level security to organization-scoped records. It assumes the API authenticates a user, verifies membership, and sets transaction-local `atlas.user_id` and `atlas.organization_id` settings before accessing tenant data. **Do not trust client-supplied organization IDs.** Provisioning and migrations require a separate privileged control-plane role. Review and integration-test these policies with the actual database role before handling customer data.
