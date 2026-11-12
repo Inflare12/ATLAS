@@ -43,3 +43,27 @@ def test_allocation_rejects_mismatched_inputs() -> None:
         json={"weights": [0.5, 0.5], "asset_returns": [0.1]},
     )
     assert response.status_code == 422
+
+
+def test_returns_distribution_endpoint() -> None:
+    response = client.post(
+        "/api/v1/portfolio/risk/returns-distribution",
+        json={
+            "returns": [-0.10, -0.05, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08],
+            "confidence_level": 0.8,
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["var_loss_fraction"] == pytest.approx(0.05)
+    assert payload["cvar_loss_fraction"] == pytest.approx(0.075)
+    assert payload["tail_observations"] == 2
+    assert payload["methodology"] == "nearest_rank_empirical_lower_tail"
+
+
+def test_returns_distribution_rejects_invalid_confidence() -> None:
+    response = client.post(
+        "/api/v1/portfolio/risk/returns-distribution",
+        json={"returns": [-0.1, 0.1], "confidence_level": 1.0},
+    )
+    assert response.status_code == 422
