@@ -1,12 +1,15 @@
 """Deterministic portfolio analytics endpoints; no market-data claims are made here."""
+
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from atlas_api.domain.risk import (
-    annualized_downside_deviation,\n    annualized_volatility,
+    annualized_downside_deviation,
+    annualized_volatility,
     concentration_hhi,
     daily_returns,
-    historical_var_cvar,\n    max_drawdown,
+    historical_var_cvar,
+    max_drawdown,
     portfolio_return,
 )
 
@@ -23,7 +26,6 @@ class AllocationRequest(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
     weights: list[float] = Field(min_length=1, max_length=500)
     asset_returns: list[float] = Field(min_length=1, max_length=500)
-
 
 
 class ReturnsDistributionRequest(BaseModel):
@@ -69,14 +71,12 @@ def analyze_price_series(request: PriceSeriesRequest) -> dict[str, object]:
 def analyze_allocation(request: AllocationRequest) -> dict[str, float]:
     """Calculate one-period portfolio return and long-only concentration."""
     try:
-        result = {
+        return {
             "weighted_return": portfolio_return(request.weights, request.asset_returns),
             "concentration_hhi": concentration_hhi(request.weights),
         }
-        return result
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-
 
 
 @router.post("/risk/returns-distribution")
@@ -106,6 +106,7 @@ def analyze_returns_distribution(
 
 @router.post("/risk/concentration")
 def analyze_concentration(request: WeightsRequest) -> dict[str, float]:
+    """Calculate long-only Herfindahl concentration from supplied weights."""
     try:
         return {"concentration_hhi": concentration_hhi(request.weights)}
     except ValueError as exc:
