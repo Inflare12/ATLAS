@@ -1,5 +1,4 @@
 import pytest
-
 from atlas_api.domain.risk import annualized_downside_deviation, historical_var_cvar
 
 
