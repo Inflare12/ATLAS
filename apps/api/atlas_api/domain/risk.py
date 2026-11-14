@@ -1,7 +1,8 @@
 """Transparent portfolio calculations over validated price/weight inputs."""
+from collections.abc import Sequence
+from itertools import pairwise
 from math import ceil, isfinite, sqrt
 from statistics import stdev
-from typing import Sequence
 
 
 def _finite_positive(values: Sequence[float], name: str) -> list[float]:
@@ -16,7 +17,7 @@ def daily_returns(prices: Sequence[float]) -> list[float]:
     series = _finite_positive(prices, "prices")
     if len(series) < 2:
         raise ValueError("at least two prices are required")
-    return [(current / previous) - 1.0 for previous, current in zip(series, series[1:])]
+    return [(current / previous) - 1.0 for previous, current in pairwise(series)]
 
 
 def annualized_volatility(returns: Sequence[float], periods_per_year: int = 252) -> float:
