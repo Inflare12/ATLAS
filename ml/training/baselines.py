@@ -10,7 +10,7 @@ import csv
 import hashlib
 import json
 import math
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Sequence
@@ -138,6 +138,7 @@ def train_ridge_baseline(
     def predict(rows: Sequence[Sequence[float]]) -> list[float]:
         return [sum(a * b for a, b in zip(row, coefficients)) for row in transform(rows)]
 
+    validation_predictions = predict(x_validation)
     test_predictions = predict(x_test)
     zero_predictions = [0.0] * len(y_test)
     train_mean = sum(y_train) / len(y_train)
@@ -169,6 +170,7 @@ def train_ridge_baseline(
         "scaler": {"means": means, "scales": scales},
         "coefficients": coefficients,
         "metrics": {
+            "validation_model": _metrics(y_validation, validation_predictions),
             "test_model": _metrics(y_test, test_predictions),
             "test_zero_return_baseline": _metrics(y_test, zero_predictions),
             "test_training_mean_baseline": _metrics(y_test, mean_predictions),
