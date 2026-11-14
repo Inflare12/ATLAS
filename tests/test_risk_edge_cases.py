@@ -1,7 +1,6 @@
 import math
 
 import pytest
-
 from atlas_api.domain.risk import annualized_volatility, daily_returns, max_drawdown
 
 

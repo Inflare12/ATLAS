@@ -1,5 +1,4 @@
 import pytest
-
 from atlas_api.domain.risk import (
     annualized_volatility,
     concentration_hhi,

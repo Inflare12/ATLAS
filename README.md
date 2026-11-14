@@ -76,3 +76,37 @@ ATLAS is split into two connected systems:
 - [Architecture index](docs/architecture/README.md) — shared contracts and the boundary between the two systems.
 
 The website calls the Platform API; the Platform API calls the internal Intelligence API. Model training is isolated from user-facing request handling.
+
+
+## Evidence packet validation (new API contract)
+
+`POST /api/v1/research/evidence-packets/validate` accepts caller-supplied source records and claims, then validates:
+- unique evidence and claim identifiers;
+- timezone-aware publication, retrieval, and claim timestamps;
+- claim references to known evidence IDs;
+- supporting, contradictory, and contextual evidence classifications.
+
+This endpoint is a schema/provenance check only. It does not independently authenticate URLs, verify source contents, fetch licensed data, persist packets, or produce investment advice. Research report generation remains disabled until authorized connectors and the evidence store are implemented.
+
+
+## Experimental CPU training baseline
+
+The repository includes a small chronological ridge-autoregression experiment. It is intended to verify the training/evaluation workflow on an authorized historical price CSV, not to generate a trading signal.
+
+CSV format:
+
+```csv
+date,close
+2024-01-01,100.00
+2024-01-02,100.50
+```
+
+Run locally:
+
+```bash
+python -m ml.training.train_baseline path/to/authorized_prices.csv --output artifacts/ridge-baseline.json
+```
+
+The pipeline validates positive prices and strictly increasing dates, builds lagged daily-return features, uses chronological 70/15/15 train/validation/test partitions, fits feature scaling on the training partition only, and compares the ridge model with zero-return and training-mean baselines. The JSON artifact includes a SHA-256 fingerprint of the supplied observations and validation/test metrics.
+
+The synthetic observations in automated tests are software fixtures only. No real financial dataset has been supplied or trained here. Before using this experiment for research, obtain data with appropriate usage rights, document adjustments and source provenance, expand to multiple instruments and market regimes, and run leakage, walk-forward, cost, calibration, and robustness checks. This baseline is not a production forecasting service.

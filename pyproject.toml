@@ -23,7 +23,7 @@ where = ["apps/api"]
 include = ["atlas_api*"]
 
 [tool.pytest.ini_options]
-pythonpath = ["apps/api"]
+pythonpath = [".", "apps/api"]
 testpaths = ["tests"]
 
 [tool.ruff]
