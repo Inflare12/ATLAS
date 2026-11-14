@@ -10,10 +10,10 @@ import csv
 import hashlib
 import json
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from collections.abc import Sequence
 
 
 @dataclass(frozen=True)
