@@ -20,6 +20,7 @@ def test_ridge_baseline_uses_chronological_holdout_and_returns_comparators():
     assert result["split"]["method"] == "chronological_70_15_15"
     assert result["split"]["training_examples"] > result["split"]["validation_examples"]
     assert set(result["metrics"]) == {
+        "validation_model",
         "test_model",
         "test_zero_return_baseline",
         "test_training_mean_baseline",
