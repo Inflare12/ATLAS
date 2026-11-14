@@ -76,3 +76,14 @@ ATLAS is split into two connected systems:
 - [Architecture index](docs/architecture/README.md) — shared contracts and the boundary between the two systems.
 
 The website calls the Platform API; the Platform API calls the internal Intelligence API. Model training is isolated from user-facing request handling.
+
+
+## Evidence packet validation (new API contract)
+
+`POST /api/v1/research/evidence-packets/validate` accepts caller-supplied source records and claims, then validates:
+- unique evidence and claim identifiers;
+- timezone-aware publication, retrieval, and claim timestamps;
+- claim references to known evidence IDs;
+- supporting, contradictory, and contextual evidence classifications.
+
+This endpoint is a schema/provenance check only. It does not independently authenticate URLs, verify source contents, fetch licensed data, persist packets, or produce investment advice. Research report generation remains disabled until authorized connectors and the evidence store are implemented.
