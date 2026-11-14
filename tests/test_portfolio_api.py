@@ -1,5 +1,4 @@
 import pytest
-
 from atlas_api.main import app
 from fastapi.testclient import TestClient
 
