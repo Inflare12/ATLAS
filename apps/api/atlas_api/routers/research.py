@@ -109,6 +109,5 @@ def create_research_report(request: ResearchRequest) -> dict[str, object]:
         detail={
             "code": "RESEARCH_ENGINE_NOT_CONFIGURED",
             "message": "A verified data connector, provenance store, and research pipeline are required.",
-            "request": request.model_dump(),
         },
     )
